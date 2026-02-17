@@ -590,8 +590,11 @@ class RenderCog(commands.Cog):
         chat: bool = True,
         team_tracers: bool = False,
     ):
-        render = RenderSingle(self.bot, interaction, replay)
-        await render.start(fps, quality, logs, anon, chat, team_tracers)
+        return await interaction.response.send_message(
+            "no longer maintained — consider using https://github.com/landaire/wows-toolkit"
+        )
+        # render = RenderSingle(self.bot, interaction, replay)
+        # await render.start(fps, quality, logs, anon, chat, team_tracers)
 
     @app_commands.command(
         name="dualrender",
@@ -618,8 +621,11 @@ class RenderCog(commands.Cog):
         quality: app_commands.Range[int, 1, 9] = 7,
         team_tracers: bool = False,
     ):
-        render = RenderDual(self.bot, interaction, replay_a, replay_b)
-        await render.start(fps, quality, name_a, name_b, team_tracers)
+        return await interaction.response.send_message(
+            "no longer maintained — consider using https://github.com/landaire/wows-toolkit"
+        )
+        # render = RenderDual(self.bot, interaction, replay_a, replay_b)
+        # await render.start(fps, quality, name_a, name_b, team_tracers)
 
     @commands.Cog.listener()
     async def on_message(self, message: discord.Message):
