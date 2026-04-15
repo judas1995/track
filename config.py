@@ -45,11 +45,10 @@ class TrackConfig:
 
     twitter = environ.group(Twitter)
 
-
 cfg: TrackConfig = TrackConfig.from_environ(
     environ={
         "CREATED": 1663989263,
-        "DISCORD_OWNER_IDS": {212466672450142208, 113104128783159296},
-        "CHANNELS_FAILED_RENDERS": 1010834704804614184,
+        "DISCORD_OWNER_IDS": {371260431232401408},
+        "CHANNELS_FAILED_RENDERS": 1475334798590476308 ,
     }
 )
