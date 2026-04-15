@@ -25,15 +25,17 @@ with (open(GENERATED_PATH) as fp1, open(EXISTING_PATH) as fp2):
             new.append(data)
 
     for data in new:
+        ship_name = data["translations"]["en"]["full"] or "Unknown"
         print(
-            f"New Ship: {data['index']} {data['translations']['en']['full']: <20}"
+            f"New Ship: {data['index']} {ship_name: <20} "
             f"{data['group']: <16}"
         )
 
     for data in changed:
         ship = next(ship for ship in existing if ship["index"] == data["index"])
+        ship_name = data["translations"]["en"]["full"] or "Unknown"
 
         print(
-            f"Changed Group: {data['index']} {data['translations']['en']['full']: <20} "
+            f"Changed Group: {data['index']} {ship_name: <20} "
             f"{ship['group']: <16} -> {data['group']: <16}"
         )

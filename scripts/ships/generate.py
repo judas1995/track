@@ -65,7 +65,12 @@ def main():
 
     gp_data: bytes = struct.pack("B" * len(gp_data), *gp_data[::-1])
     gp_data: bytes = zlib.decompress(gp_data)
-    gp_data: dict = pickle.loads(gp_data, encoding=ENCODING)[0]
+    #gp_data: dict = pickle.loads(gp_data, encoding=ENCODING)
+    parsed_data = pickle.loads(gp_data, encoding=ENCODING)
+    if '' in parsed_data:
+        gp_data = parsed_data['']
+    else:
+        gp_data = list(parsed_data.values())[0]
 
     ships = []
     for index, entity in gp_data.items():
