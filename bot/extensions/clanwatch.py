@@ -18,6 +18,8 @@ from config import cfg
 
 TEAM_NAMES = {1: "Alpha", 2: "Bravo"}
 DIVISION_ROMAN = {1: "I", 2: "II", 3: "III"}
+# league value: 0=Hurricane(highest) ... 4=Squall(lowest)
+LEAGUE_MEDALS = {0: "🔮紫金", 1: "💎白金", 2: "🥇金牌", 3: "🥈銀牌", 4: "🥉銅牌"}
 PER_PAGE = 15
 
 
@@ -231,7 +233,13 @@ class ClanWatchCog(commands.Cog):
             await session.execute(
                 update(db.ClanWatcher)
                 .where(db.ClanWatcher.id == watcher.id)
-                .values(**{f"last_battles_{team}": total_b, f"last_wins_{team}": total_w})
+                .values(**{
+                    f"last_battles_{team}": total_b,
+                    f"last_wins_{team}": total_w,
+                    f"last_league_{team}": league,
+                    f"last_division_{team}": division,
+                    f"last_dr_{team}": div_rating,
+                })
             )
             await session.commit()
 
@@ -339,10 +347,10 @@ class ClanWatchCog(commands.Cog):
                 clan_tag=clan.clan.tag,
                 clan_name=clan.clan.name,
                 season=current_season,
-                last_battles_1=b1,
-                last_wins_1=w1,
-                last_battles_2=b2,
-                last_wins_2=w2,
+                last_battles_1=b1, last_wins_1=w1,
+                last_league_1=lg1, last_division_1=dv1, last_dr_1=dr1,
+                last_battles_2=b2, last_wins_2=w2,
+                last_league_2=lg2, last_division_2=dv2, last_dr_2=dr2,
                 created_at=int(time.time()),
                 is_active=True,
             )
@@ -414,6 +422,12 @@ class ClanWatchCog(commands.Cog):
         for w in watchers:
             wr1 = f"{100 * w.last_wins_1 / w.last_battles_1:.1f}%" if w.last_battles_1 else "N/A"
             wr2 = f"{100 * w.last_wins_2 / w.last_battles_2:.1f}%" if w.last_battles_2 else "N/A"
+            tier1 = _tier_str(w.region, w.season, w.last_league_1, w.last_division_1)
+            tier2 = _tier_str(w.region, w.season, w.last_league_2, w.last_division_2)
+            medal1 = LEAGUE_MEDALS.get(w.last_league_1, "")
+            medal2 = LEAGUE_MEDALS.get(w.last_league_2, "")
+            bo5_1 = " 🎯BO5" if w.last_dr_1 >= 100 else ""
+            bo5_2 = " 🎯BO5" if w.last_dr_2 >= 100 else ""
             channel = self.bot.get_channel(w.channel_id)
             chan_str = channel.mention if channel else f"<#{w.channel_id}>"
             tracking_since = f"<t:{w.created_at}:D>" if w.created_at else "Unknown"
@@ -421,8 +435,8 @@ class ClanWatchCog(commands.Cog):
                 name=f"ID {w.id} — [{w.clan_tag}] {w.clan_name}",
                 value=(
                     f"Region: `{w.region.upper()}` | Season: `{w.season}` | Tracking since: {tracking_since}\n"
-                    f"Alpha: `{w.last_battles_1}` battles ({wr1})\n"
-                    f"Bravo: `{w.last_battles_2}` battles ({wr2})\n"
+                    f"Alpha: `{tier1}` {medal1} DR:`{w.last_dr_1}` — {w.last_battles_1} battles ({wr1}){bo5_1}\n"
+                    f"Bravo: `{tier2}` {medal2} DR:`{w.last_dr_2}` — {w.last_battles_2} battles ({wr2}){bo5_2}\n"
                     f"Channel: {chan_str}"
                 ),
                 inline=False,

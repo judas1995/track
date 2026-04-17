@@ -98,10 +98,16 @@ class ClanWatcher(Base):
     clan_tag = Column(String, nullable=False)
     clan_name = Column(String, nullable=False)
     season = Column(Integer, nullable=False)
-    last_battles_1 = Column(Integer, default=0)  # Alpha
+    last_battles_1 = Column(Integer, default=0)   # Alpha
     last_wins_1 = Column(Integer, default=0)
-    last_battles_2 = Column(Integer, default=0)  # Bravo
+    last_league_1 = Column(Integer, default=0)
+    last_division_1 = Column(Integer, default=1)
+    last_dr_1 = Column(Integer, default=0)
+    last_battles_2 = Column(Integer, default=0)   # Bravo
     last_wins_2 = Column(Integer, default=0)
+    last_league_2 = Column(Integer, default=0)
+    last_division_2 = Column(Integer, default=1)
+    last_dr_2 = Column(Integer, default=0)
     created_at = Column(Integer, default=0)
     is_active = Column(Boolean, default=True)
 
