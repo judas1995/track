@@ -3,7 +3,7 @@ import os
 import cachetools
 import cachetools.keys
 from sqlalchemy import Boolean, Column, Float, Integer, JSON, String
-from sqlalchemy import select
+from sqlalchemy import select, Index
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
@@ -39,7 +39,7 @@ class CachedMixin:
             return cached
 
         # noinspection PyUnresolvedReferences
-        clauses = [cls.__table__.columns[key] == value for key, value in kwargs.items()]
+        clauses = [cls.__table__.columns[col] == value for col, value in kwargs.items()]
 
         async with async_session() as session:
             statement = select(cls).where(*clauses)
@@ -85,6 +85,42 @@ class Guild(Base, CachedMixin):
     locale = Column(String, default=None)
     is_blacklisted = Column(Boolean, default=False)
     is_premium = Column(Boolean, default=False)
+
+
+class ClanWatcher(Base):
+    __tablename__ = "clan_watchers"
+
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    guild_id = Column(Integer, nullable=False)
+    channel_id = Column(Integer, nullable=False)
+    region = Column(String, nullable=False)
+    clan_id = Column(Integer, nullable=False)
+    clan_tag = Column(String, nullable=False)
+    clan_name = Column(String, nullable=False)
+    season = Column(Integer, nullable=False)
+    last_battles_1 = Column(Integer, default=0)  # Alpha
+    last_wins_1 = Column(Integer, default=0)
+    last_battles_2 = Column(Integer, default=0)  # Bravo
+    last_wins_2 = Column(Integer, default=0)
+    created_at = Column(Integer, default=0)
+    is_active = Column(Boolean, default=True)
+
+
+class ClanBattleRecord(Base):
+    __tablename__ = "clan_battle_records"
+
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    watcher_id = Column(Integer, nullable=False)
+    team = Column(Integer, nullable=False)  # 1=Alpha, 2=Bravo
+    timestamp = Column(Integer, nullable=False)
+    battles_delta = Column(Integer, nullable=False)
+    wins_delta = Column(Integer, nullable=False)
+    total_battles = Column(Integer, nullable=False)
+    total_wins = Column(Integer, nullable=False)
+    result = Column(String, nullable=True)  # 'W', 'L', or None when multiple battles
+    division_rating = Column(Integer, default=0)  # ==100 means entered BO5 promotion
+    league = Column(Integer, default=0)           # 0=Squall, 1=Gale, 2=Storm, 3=Typhoon, 4=Hurricane
+    division = Column(Integer, default=1)         # 1/2/3 within the league
 
 
 if __name__ == "__main__":

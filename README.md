@@ -73,6 +73,33 @@ Which queues the worker should listen to can be specified with the respective op
 
 ---
 
+### Clan Battle Tracker (`/clanwatch`)
+
+Track a clan's clan battle win rate secretly, per team (Alpha / Bravo).
+
+The bot polls each tracked clan every **15 minutes** via the WG API and records any change in battle count. If the delta is exactly 1, the result (Win/Loss) can be determined directly. If multiple battles happened between polls, it records them as a group (e.g. "3 battles: 2W/1L").
+
+#### Commands
+
+| Command | Permission | Description |
+|---|---|---|
+| `/clanwatch add <region> <clan> <channel>` | Admin | Start tracking a clan. Sets the notification channel and records current battle counts as baseline. |
+| `/clanwatch remove <watcher_id>` | Admin | Stop tracking a clan. |
+| `/clanwatch export <watcher_id>` | Admin | Download all battle records as a JSON file. |
+| `/clanwatch import <file>` | Admin | Import records from a previously exported JSON file (duplicate records are skipped). |
+| `/clanwatch list` | Everyone | Show all tracked clans in this server with current stats and tracking start date. |
+| `/clanwatch history <watcher_id>` | Everyone | Paginated battle history (15 per page, newest first). |
+
+**Admin** = user has *Manage Server* permission, or their Discord user ID is in `cfg.discord.owner_ids`.
+
+#### Notes
+
+- Tracking state (last known battle counts) is persisted in the database. After a bot restart, polling resumes correctly from where it left off without duplicate notifications.
+- The tracker respects the existing API rate limiter (`vortex_limit`, 10 req/s) and adds a 2-second delay between each tracked clan to avoid bursting. Keep the number of tracked clans reasonable (< 20 is fine).
+- Alpha and Bravo teams are tracked independently since they may use different strategies.
+
+---
+
 ### License
 
 This project is licensed under the GNU AGPLv3 License.
